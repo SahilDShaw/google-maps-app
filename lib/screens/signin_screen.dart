@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_app/providers/user_provider.dart';
 import 'package:google_maps_app/screens/guest_page.dart';
+import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -11,8 +13,9 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  TextEditingController? _textController1;
-  TextEditingController? _textController2;
+  TextEditingController? _emailController;
+  TextEditingController? _passwordController;
+  String? _errorMessage = null;
 
   late bool _passwordVisibility = false;
   final _formKey = GlobalKey<FormState>();
@@ -22,15 +25,15 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   void initState() {
     super.initState();
-    _textController1 = TextEditingController();
-    _textController2 = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
     _passwordVisibility = false;
   }
 
   @override
   void dispose() {
-    _textController1?.dispose();
-    _textController2?.dispose();
+    _emailController?.dispose();
+    _passwordController?.dispose();
     super.dispose();
   }
 
@@ -72,12 +75,16 @@ class _SignInScreenState extends State<SignInScreen> {
                           horizontal: 30, vertical: 5),
                       child: TextFormField(
                         key: _emailKey,
-                        controller: _textController1,
+                        controller: _emailController,
                         autofocus: true,
                         obscureText: false,
                         validator: (String? value) {
                           if (value == null || value.isEmpty) {
                             return 'Enter an email.';
+                          } else if (!RegExp(
+                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(value)) {
+                            return 'Enter a valid email.';
                           }
                           return null;
                         },
@@ -95,7 +102,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           horizontal: 30, vertical: 5),
                       child: TextFormField(
                         key: _passwordKey,
-                        controller: _textController2,
+                        controller: _passwordController,
                         autofocus: true,
                         obscureText: !_passwordVisibility,
                         validator: (String? value) {
@@ -130,14 +137,33 @@ class _SignInScreenState extends State<SignInScreen> {
                   ],
                 ),
               ),
+              // error message
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    _errorMessage.toString(),
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               // submit button
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      //  TODO: check validity at backend
-
+                      String? message = await Provider.of<UserProvider>(context,
+                              listen: false)
+                          .signInUser(_emailController!.text,
+                              _passwordController!.text);
+                      if (message != null) {
+                        setState(() {
+                          _errorMessage = message;
+                        });
+                      }
                     }
                   },
                   child: const Text(
