@@ -42,22 +42,6 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  Future<void> setUserData() {
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user!.uid;
-    final document = FirebaseFirestore.instance.collection('UserData').doc(uid);
-    return document.get().then(
-      (snapshot) {
-        final values = snapshot.data();
-        Provider.of<UserProvider>(context).setData(
-          name: values!['name'].toString(),
-          email: values['name'].toString(),
-          address: values['name'].toString(),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context).size;
@@ -193,12 +177,13 @@ class _SignInScreenState extends State<SignInScreen> {
                             _errorMessage = message;
                           });
                         } else {
+                          await Provider.of<UserProvider>(context,
+                                  listen: false)
+                              .getDataFromFirebase();
                           Navigator.of(context)
                               .popUntil(ModalRoute.withName('/'));
                           Navigator.of(context)
                               .pushReplacementNamed(HomeScreen.routeName);
-
-                          await setUserData();
                         }
                       }
                     },

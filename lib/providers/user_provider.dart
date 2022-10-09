@@ -82,6 +82,7 @@ class UserProvider with ChangeNotifier {
         );
   }
 
+  // sign in
   Future<String?> signInUser(String emailAddress, String password) async {
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -100,6 +101,56 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  // updating provider from firebase
+  Future<void> getDataFromFirebase() {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user!.uid;
+    final document = FirebaseFirestore.instance.collection('UserData').doc(uid);
+    return document.get().then(
+      (snapshot) {
+        final values = snapshot.data();
+        print(values);
+        setData(
+          name: values!['name'].toString(),
+          email: values['email'].toString(),
+          address: values['address'].toString(),
+        );
+      },
+    );
+  }
+
+  // edit user
+  Future<String?> editUser({
+    required String name,
+    required String emailAddress,
+    required String address,
+    required String password,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user!.uid;
+    final users = FirebaseFirestore.instance.collection('UserData');
+
+    await user.updateEmail(emailAddress);
+    await user.updatePassword(password);
+
+    return users.doc(uid).set(
+      {
+        'name': name,
+        'email': emailAddress,
+        'address': address,
+      },
+    ).then((value) {
+      _name = name;
+      _email = emailAddress;
+      _address = address;
+      notifyListeners();
+      print("User Edited");
+    }).catchError(
+      (error) => print("Failed to create user: $error"),
+    );
+  }
+
+  // sign out
   Future<void> signOutUser() async {
     await FirebaseAuth.instance.signOut();
     notifyListeners();

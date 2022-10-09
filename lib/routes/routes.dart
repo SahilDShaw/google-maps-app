@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:google_maps_app/screens/edit_details_screen.dart';
 
 import '../screens/guest_page.dart';
 import '../screens/home_screen.dart';
@@ -20,4 +21,6 @@ Map<String, Widget Function(BuildContext)> routes = {
   LocationTab.routeName: (BuildContext ctx) => const LocationTab(),
   // signup screen
   SignUpScreen.routeName: (BuildContext ctx) => const SignUpScreen(),
+  // edit details screen
+  EditDetailsScreen.routeName: (BuildContext ctx) => const EditDetailsScreen(),
 };
