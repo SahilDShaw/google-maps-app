@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProvider with ChangeNotifier {
   // Data
@@ -25,12 +26,22 @@ class UserProvider with ChangeNotifier {
   }
 
   // create new user
-  Future<String?> createNewUser(String emailAddress, String password) async {
+  Future<String?> createNewUser({
+    required String name,
+    required String emailAddress,
+    required String password,
+    required String address,
+  }) async {
     try {
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAddress,
         password: password,
+      );
+      await dataEntry(
+        name: name,
+        emailAddress: emailAddress,
+        address: address,
       );
       return null;
     } on FirebaseAuthException catch (e) {
@@ -44,6 +55,30 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  // create entry in the database
+  Future<void> dataEntry({
+    required String name,
+    required String emailAddress,
+    required String address,
+  }) {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user!.uid;
+    final users = FirebaseFirestore.instance.collection('UserData');
+    return users
+        .doc(uid)
+        .set(
+          {
+            'name': name,
+            'email': emailAddress,
+            'address': address,
+          },
+        )
+        .then((value) => print("User Created"))
+        .catchError(
+          (error) => print("Failed to create user: $error"),
+        );
+  }
+
   Future<String?> signInUser(String emailAddress, String password) async {
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -51,6 +86,7 @@ class UserProvider with ChangeNotifier {
         password: password,
       );
       print('User signed in');
+      notifyListeners();
       return null;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -63,5 +99,6 @@ class UserProvider with ChangeNotifier {
 
   Future<void> signOutUser() async {
     await FirebaseAuth.instance.signOut();
+    notifyListeners();
   }
 }
