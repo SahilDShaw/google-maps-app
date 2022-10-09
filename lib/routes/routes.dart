@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import '../screens/guest_page.dart';
 import '../screens/home_screen.dart';
-import '../screens/location_tab.dart';
-import '../screens/profile_tab.dart';
+import '../tabs/location_tab.dart';
+import '../tabs/profile_tab.dart';
 import '../screens/signup_screen.dart';
 import '../screens/signin_screen.dart';
 

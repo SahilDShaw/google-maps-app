@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/location_tab.dart';
+import '../tabs/location_tab.dart';
 import '../theme/config.dart';
 
 class GuestPage extends StatefulWidget {

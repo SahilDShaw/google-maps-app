@@ -43,6 +43,9 @@ class UserProvider with ChangeNotifier {
         emailAddress: emailAddress,
         address: address,
       );
+      _name = name;
+      _email = emailAddress;
+      _address = address;
       return null;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
-import './location_tab.dart';
-import './profile_tab.dart';
+import '../tabs/location_tab.dart';
+import '../tabs/profile_tab.dart';
 import '../theme/config.dart';
 
 class HomeScreen extends StatefulWidget {

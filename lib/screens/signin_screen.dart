@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../providers/user_provider.dart';
 import '../screens/guest_page.dart';
@@ -38,6 +40,22 @@ class _SignInScreenState extends State<SignInScreen> {
     _emailController?.dispose();
     _passwordController?.dispose();
     super.dispose();
+  }
+
+  Future<void> setUserData() {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user!.uid;
+    final document = FirebaseFirestore.instance.collection('UserData').doc(uid);
+    return document.get().then(
+      (snapshot) {
+        final values = snapshot.data();
+        Provider.of<UserProvider>(context).setData(
+          name: values!['name'].toString(),
+          email: values['name'].toString(),
+          address: values['name'].toString(),
+        );
+      },
+    );
   }
 
   @override
@@ -179,6 +197,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               .popUntil(ModalRoute.withName('/'));
                           Navigator.of(context)
                               .pushReplacementNamed(HomeScreen.routeName);
+
+                          await setUserData();
                         }
                       }
                     },
