@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_app/location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 import '../providers/user_provider.dart';
 import '../screens/guest_page.dart';
@@ -26,6 +29,70 @@ class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _emailKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _passwordKey = GlobalKey<FormFieldState>();
+
+  // asking permission for location
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  // getting address from lat and lng
+  Future<void> _getAddressFromLatLng(Position position) async {
+    await placemarkFromCoordinates(MyLocation.currentPosition!.latitude,
+            MyLocation.currentPosition!.longitude)
+        .then((List<Placemark> placemarks) {
+      Placemark place = placemarks[0];
+      setState(() {
+        MyLocation.currentAddress =
+            '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}';
+      });
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
+
+  // getting current position and address
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() => MyLocation.currentPosition = position);
+    }).catchError((e) {
+      debugPrint(e);
+    });
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() => MyLocation.currentPosition = position);
+      _getAddressFromLatLng(MyLocation.currentPosition!);
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
 
   @override
   void initState() {
@@ -180,6 +247,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           await Provider.of<UserProvider>(context,
                                   listen: false)
                               .getDataFromFirebase();
+                          await _getCurrentPosition();
                           Navigator.of(context)
                               .popUntil(ModalRoute.withName('/'));
                           Navigator.of(context)
@@ -224,7 +292,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 Align(
                   alignment: Alignment.bottomRight,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await _getCurrentPosition();
                       Navigator.of(context).pushNamed(GuestPage.routeName);
                     },
                     child: const Padding(

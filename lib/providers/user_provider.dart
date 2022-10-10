@@ -124,14 +124,24 @@ class UserProvider with ChangeNotifier {
     required String name,
     required String emailAddress,
     required String address,
-    required String password,
+    required String currPassword,
+    required String newPassword,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user!.uid;
     final users = FirebaseFirestore.instance.collection('UserData');
+    var credential = EmailAuthProvider.credential(
+        email: _email.toString(), password: currPassword);
 
+    // updating email
+    await user.reauthenticateWithCredential(credential);
     await user.updateEmail(emailAddress);
-    await user.updatePassword(password);
+
+    credential = EmailAuthProvider.credential(
+        email: emailAddress, password: currPassword);
+    // updating password
+    await user.reauthenticateWithCredential(credential);
+    await user.updatePassword(newPassword);
 
     return users.doc(uid).set(
       {
