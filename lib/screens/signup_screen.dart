@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_app/location/location.dart';
 import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 
 import '../screens/home_screen.dart';
 import '../providers/user_provider.dart';
@@ -31,70 +28,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormFieldState> _password2Key = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _nameKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _addressKey = GlobalKey<FormFieldState>();
-
-  // asking premission for location
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
-      return false;
-    }
-    return true;
-  }
-
-  // getting address from lat and lng
-  Future<void> _getAddressFromLatLng(Position position) async {
-    await placemarkFromCoordinates(MyLocation.currentPosition!.latitude,
-            MyLocation.currentPosition!.longitude)
-        .then((List<Placemark> placemarks) {
-      Placemark place = placemarks[0];
-      setState(() {
-        MyLocation.currentAddress =
-            '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}';
-      });
-    }).catchError((e) {
-      debugPrint(e);
-    });
-  }
-
-  // getting current position and address
-  Future<void> _getCurrentPosition() async {
-    final hasPermission = await _handleLocationPermission();
-    if (!hasPermission) return;
-    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then((Position position) {
-      setState(() => MyLocation.currentPosition = position);
-    }).catchError((e) {
-      debugPrint(e);
-    });
-    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then((Position position) {
-      setState(() => MyLocation.currentPosition = position);
-      _getAddressFromLatLng(MyLocation.currentPosition!);
-    }).catchError((e) {
-      debugPrint(e);
-    });
-  }
 
   @override
   void initState() {
@@ -334,7 +267,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               _errorMessage = message;
                             });
                           } else {
-                            await _getCurrentPosition();
                             Navigator.of(context)
                                 .popUntil(ModalRoute.withName('/'));
                             Navigator.of(context)

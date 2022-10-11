@@ -30,15 +30,11 @@ class ProfileTab extends StatelessWidget {
                 fontSize: 16,
               ),
             ),
-            subtitle: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                value,
-                softWrap: true,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontSize: 24,
-                ),
+            subtitle: Text(
+              value,
+              softWrap: true,
+              style: const TextStyle(
+                fontSize: 24,
               ),
             ),
           ),

@@ -15,7 +15,6 @@ class EditDetailsScreen extends StatefulWidget {
 
 class _EditDetailsScreenState extends State<EditDetailsScreen> {
   TextEditingController? _emailController;
-  TextEditingController? _currPasswordController;
   TextEditingController? _passwordController;
   TextEditingController? _password2Controller;
   TextEditingController? _nameController;
@@ -23,11 +22,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   String? _errorMessage = null;
 
   late bool _passwordVisibility = false;
-  late bool _currPasswordVisibility = false;
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _emailKey = GlobalKey<FormFieldState>();
-  final GlobalKey<FormFieldState> _currPasswordKey =
-      GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _passwordKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _password2Key = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _nameKey = GlobalKey<FormFieldState>();
@@ -37,7 +33,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   void initState() {
     super.initState();
     _emailController = TextEditingController();
-    _currPasswordController = TextEditingController();
     _passwordController = TextEditingController();
     _password2Controller = TextEditingController();
     _nameController = TextEditingController();
@@ -48,7 +43,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   @override
   void dispose() {
     _emailController?.dispose();
-    _currPasswordController?.dispose();
     _passwordController?.dispose();
     _password2Controller?.dispose();
     _nameController?.dispose();
@@ -77,11 +71,11 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(),
-                  // edit profile text
+                  // sign up text
                   const Padding(
                     padding: EdgeInsets.all(20),
                     child: Text(
-                      'Edit Profile',
+                      'Sign Up',
                       textAlign: TextAlign.center,
                       softWrap: true,
                       style: TextStyle(
@@ -169,48 +163,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                             ),
                           ),
                         ),
-                        // current password
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 5),
-                          child: TextFormField(
-                            key: _currPasswordKey,
-                            controller: _currPasswordController,
-                            autofocus: true,
-                            obscureText: !_currPasswordVisibility,
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Enter a password.';
-                              } else if (value.length < 6) {
-                                return 'Password must be atleast 6 characters long.';
-                              }
-                              return null;
-                            },
-                            onFieldSubmitted: (String? value) {
-                              _currPasswordKey.currentState!.validate();
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Current Password',
-                              suffixIcon: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _currPasswordVisibility =
-                                        !_currPasswordVisibility;
-                                  });
-                                },
-                                focusNode: FocusNode(skipTraversal: true),
-                                child: Icon(
-                                  _currPasswordVisibility
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: const Color(0xFF757575),
-                                  size: 22,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        // new password
+                        // password
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 5),
@@ -231,7 +184,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                               _passwordKey.currentState!.validate();
                             },
                             decoration: InputDecoration(
-                              labelText: 'New Password',
+                              labelText: 'Password',
                               suffixIcon: InkWell(
                                 onTap: () {
                                   setState(() {
@@ -306,8 +259,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                               .editUser(
                             name: _nameController!.text,
                             emailAddress: _emailController!.text,
-                            currPassword: _currPasswordController!.text,
-                            newPassword: _password2Controller!.text,
+                            password: _password2Controller!.text,
                             address: _addressController!.text,
                           );
                           if (message != null) {
