@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_app/location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../location/location.dart';
 import '../providers/user_provider.dart';
 import '../screens/guest_page.dart';
 import '../screens/home_screen.dart';

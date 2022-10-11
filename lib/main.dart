@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nord_theme/flutter_nord_theme.dart';
-import 'package:google_maps_app/theme/config.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '../theme/config.dart';
 import './providers/user_provider.dart';
 import './routes/routes.dart';
 import './screens/welcome_screen.dart';

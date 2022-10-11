@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_maps_app/screens/edit_details_screen.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/edit_details_screen.dart';
 import '../providers/user_provider.dart';
 
 class ProfileTab extends StatelessWidget {

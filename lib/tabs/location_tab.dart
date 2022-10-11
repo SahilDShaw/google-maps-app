@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:google_maps_app/location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+
+import '../location/location.dart';
 
 class LocationTab extends StatefulWidget {
   const LocationTab({Key? key}) : super(key: key);

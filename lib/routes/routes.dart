@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:google_maps_app/screens/edit_details_screen.dart';
 
+import '../screens/edit_details_screen.dart';
 import '../screens/guest_page.dart';
 import '../screens/home_screen.dart';
 import '../tabs/location_tab.dart';
